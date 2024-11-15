@@ -1,16 +1,11 @@
 # frozen_string_literal: true
 
 Doorkeeper.configure do
-  # Change the ORM that doorkeeper will use (requires ORM extensions installed).
-  # Check the list of supported ORMs here: https://github.com/doorkeeper-gem/doorkeeper#orms
   orm :active_record
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    raise "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
-    # Put your resource owner authentication logic here.
-    # Example implementation:
-    #   User.find_by(id: session[:user_id]) || redirect_to(new_user_session_url)
+    User.find_by(id: session[:user_id]) || redirect_to(new_user_session_url)
   end
 
   # If you didn't skip applications controller from Doorkeeper routes in your application routes.rb
@@ -18,16 +13,13 @@ Doorkeeper.configure do
   # adding oauth authorized applications. In other case it will return 403 Forbidden response
   # every time somebody will try to access the admin web interface.
   #
-  # admin_authenticator do
-  #   # Put your admin authentication logic here.
-  #   # Example implementation:
-  #
-  #   if current_user
-  #     head :forbidden unless current_user.admin?
-  #   else
-  #     redirect_to sign_in_url
-  #   end
-  # end
+  admin_authenticator do
+    if current_user
+      head :forbidden unless current_user.system_administrator?
+    else
+      redirect_to sign_in_url
+    end
+  end
 
   # You can use your own model classes if you need to extend (or even override) default
   # Doorkeeper models such as `Application`, `AccessToken` and `AccessGrant.
@@ -84,11 +76,11 @@ Doorkeeper.configure do
   # Enforce token request content type to application/x-www-form-urlencoded.
   # It is not enabled by default to not break prior versions of the gem.
   #
-  # enforce_content_type
+  enforce_content_type
 
   # Authorization Code expiration time (default: 10 minutes).
   #
-  # authorization_code_expires_in 10.minutes
+  authorization_code_expires_in 10.minutes
 
   # Access token expiration time (default: 2 hours).
   # If you set this to `nil` Doorkeeper will not expire the token and omit expires_in in response.
@@ -96,7 +88,7 @@ Doorkeeper.configure do
   # Prefer access_token_expires_in 100.years or similar,
   # which would be functionally equivalent and avoid the risk of unexpected behavior by callers.
   #
-  # access_token_expires_in 2.hours
+  access_token_expires_in 2.hours
 
   # Assign custom TTL for access tokens. Will be used instead of access_token_expires_in
   # option if defined. In case the block returns `nil` value Doorkeeper fallbacks to
@@ -230,7 +222,7 @@ Doorkeeper.configure do
   # `grant_type` - the grant type of the request (see Doorkeeper::OAuth)
   # `scopes` - the requested scopes (see Doorkeeper::OAuth::Scopes)
   #
-  # use_refresh_token
+  use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
   # Optional parameter confirmation: true (default: false) if you want to enforce ownership of
@@ -244,8 +236,8 @@ Doorkeeper.configure do
   # For more information go to
   # https://doorkeeper.gitbook.io/guides/ruby-on-rails/scopes
   #
-  # default_scopes  :public
-  # optional_scopes :write, :update
+  default_scopes :public
+  optional_scopes :admin
 
   # Allows to restrict only certain scopes for grant_type.
   # By default, all the scopes will be available for all the grant types.
@@ -296,7 +288,7 @@ Doorkeeper.configure do
   # You can use this option in order to forbid URI's with 'javascript' scheme
   # for example.
   #
-  # forbid_redirect_uri { |uri| uri.scheme.to_s.downcase == 'javascript' }
+  forbid_redirect_uri { |uri| uri.scheme.to_s.downcase == "javascript" }
 
   # Allows to set blank redirect URIs for Applications in case Doorkeeper configured
   # to use URI-less OAuth grant flows like Client Credentials or Resource Owner
@@ -525,5 +517,5 @@ Doorkeeper.configure do
 
   # WWW-Authenticate Realm (default: "Doorkeeper").
   #
-  # realm "Doorkeeper"
+  realm "Auth"
 end
