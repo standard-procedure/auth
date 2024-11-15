@@ -8,7 +8,7 @@ gem "importmap-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "bcrypt", "~> 3.1.7"
-gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "tzinfo-data", platforms: %i[windows jruby]
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
@@ -18,7 +18,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 gem "devise" # Authentication
-gem 'devise-two-factor' # 2FA authentication
+gem "devise-two-factor" # 2FA authentication
 gem "doorkeeper" # OAuth2 provider
 gem "rack-cors", require: "rack/cors" # Allow API access
 
@@ -26,10 +26,11 @@ gem "alba" # JSON serialization
 
 gem "phlex-rails" # UI Components
 
+gem "faker" # Fake data generation
+
 group :development, :test do
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
   gem "oaken"
-  gem "faker"
   gem "rspec-rails", require: false
   gem "brakeman", require: false
 end
